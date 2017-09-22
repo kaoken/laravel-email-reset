@@ -1,7 +1,7 @@
 {{__('mail_reset.msg_change_email')}}
 
 {{__('mail_reset.msg_move_url')}}
-{{$registerUrl}}
+{{ secure_url('user/email/reset/'.$user->id.'/'.$email.'/'.$token.'/') }}
 
 ・{{__('mail_reset.msg_move_url')}}
 ・{{__('mail_reset.msg_user_delete')}}

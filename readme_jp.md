@@ -1,8 +1,8 @@
 # laravel-email-reset
 Authユーザーのメールアドレスを変更依頼をし、確認メールの変更先URLへ移動後変更する。
 
-[![TeamCity (simple build status)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/s/bt345.svg)]()
-[![composer version](https://img.shields.io/badge/version-0.0.0-blue.svg)](https://github.com/kaoken/laravel-email-reset)
+[![Travis branch](https://img.shields.io/travis/rust-lang/rust/master.svg)](https://github.com/kaoken/laravel-email-reset)
+[![composer version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![laravel version](https://img.shields.io/badge/Laravel%20version-≧5.5-red.svg)](https://github.com/kaoken/laravel-email-reset)
 
@@ -59,10 +59,10 @@ composer install kaoken/laravel-email-reset
             "dont-discover": [
             ],
             "providers": [
-                "Kaoken\LaravelMailReset\MailResetServiceProvider",
+                "Kaoken\\LaravelMailReset\\MailResetServiceProvider",
             ],
             "aliases": {
-                "MailReset": "Kaoken\LaravelMailReset\Facades\MailReset"
+                "MailReset": "Kaoken\\LaravelMailReset\\Facades\\MailReset"
             }
         }
     },
@@ -86,7 +86,6 @@ composer install kaoken/laravel-email-reset
 ```  
 
 - `model`は、ユーザーモデルクラス
-- `path`は、トークンを使用した登録時に使用するURLの途中パス(例：`http(s):://hoge.com/{path}/{id}/{email}/{token}`)
 - `email_reset`は、[Mailable](https://readouble.com/laravel/5.5/ja/mail)で派生したクラスを必要に応じて変更すること。
 確認メールを送るときに使用する。  
 - `table`は、このサービスで使用するテーブル名
@@ -96,17 +95,16 @@ composer install kaoken/laravel-email-reset
     'email_resets' => [
         'users' => [
             'model' => App\User::class,
-            'path' => 'user/mail_reset/',
             'email_reset' => Kaoken\LaravelMailReset\Mail\MailResetConfirmationToUser::class,
             'table' => 'mail_reset_users',
-            'expire' => 24,
+            'expire' => 1,
         ]
     ],
 ```
 
 ### コマンドの実行
 ```bash
-php artisan vendor:publish --tag=confirmation
+php artisan vendor:publish --tag=mail-reset
 ```
 実行後、以下のディレクトリやファイルが追加される。   
 
@@ -198,7 +196,7 @@ class MailResetController extends Controller
     {
         $all = $request->only(['email']);
         $validator = Validator::make($all,[
-            'email' => 'required|unique:users,email|max:255',
+            'email' => 'required|unique:users,email|max:255|email',
         ]);
 
         if ($validator->fails()) {
@@ -235,11 +233,11 @@ Route::group([
         'middleware' => ['auth:user'],
     ],
     function(){
-        Route::get('user/mail_reset', 'MailResetController@getChangeMail');
-        Route::post('user/mail_reset', 'MailResetController@postChangeMail');
-        Route::get('user/mail_reset/{id}/{email}/{token}', 'MailResetController@getChangeMailAddress');
+        Route::get('user/mail/reset', 'MailResetController@getChangeMail');
+        Route::post('user/mail/reset', 'MailResetController@postChangeMail');
     }
 );
+Route::get('user/mail/reset/{id}/{email}/{token}', 'MailResetController@getChangeMailAddress');
 ```
 
 ## イベント

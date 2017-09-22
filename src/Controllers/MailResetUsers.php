@@ -17,7 +17,7 @@ trait MailResetUsers
     protected function sendMailAddressChangeLink($userId, $newEmail)
     {
         $broker = null;
-        if( method_exists($this, 'broker') )
+        if( property_exists($this, 'broker') )
             $broker = $this->broker;
 
         $response = MailReset::broker($this->broker)
@@ -55,7 +55,7 @@ trait MailResetUsers
     {
         if( !($newEmail == "" || $token == "") ){
             $broker = null;
-            if( method_exists($this, 'broker') )
+            if( property_exists($this, 'broker') )
                 $broker = $this->broker;
 
             $obj = MailReset::broker($broker);

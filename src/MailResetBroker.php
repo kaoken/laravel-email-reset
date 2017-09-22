@@ -15,12 +15,6 @@ class MailResetBroker implements IMailResetBroker
      */
     protected $db;
     /**
-     * Middle path of URL
-     *
-     * @var string
-     */
-    protected $path;
-    /**
      * User model
      *
      * @var \Illuminate\Database\Eloquent\Model
@@ -46,19 +40,16 @@ class MailResetBroker implements IMailResetBroker
      * Create a new email reset broker instance.
      * @param  MailResetDB $db
      * @param  string $model
-     * @param  string $path
      * @param  Mailer  $mailer
      * @param  string  $emailConfirmationClass
      */
     public function __construct(
         MailResetDB $db,
         string $model,
-        string $path,
         Mailer $mailer,
         string $emailConfirmationClass)
     {
         $this->db = $db;
-        $this->path = $path;
         $this->model = $model;
         $this->mailer = $mailer;
         $this->emailConfirmationClass = $emailConfirmationClass;
@@ -82,7 +73,7 @@ class MailResetBroker implements IMailResetBroker
         }
 
         $user = $this->db->getUser($userId);
-        $this->emailConfirmationLink($user, $token);
+        $this->emailConfirmationLink($user, $token, $newEmail);
         event(new MailResetConfirmationEvent($user, $token));
 
         return static::CHANGE_LINK_SENT;
@@ -94,12 +85,13 @@ class MailResetBroker implements IMailResetBroker
      *
      * @param  object  $user
      * @param  string  $token
+     * @param  string $newEmail Change new mail address
      * @return void
      */
-    protected function emailConfirmationLink($user, $token)
+    protected function emailConfirmationLink($user, $token, $newEmail)
     {
         $class = $this->emailConfirmationClass;
-        $this->mailer->send(new $class($user, $token, url($this->path.urlencode($user->email)."/".$token)));
+        $this->mailer->send(new $class($user, $token, $newEmail));
     }
 
 

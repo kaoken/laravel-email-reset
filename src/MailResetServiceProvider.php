@@ -46,7 +46,7 @@ class MailResetServiceProvider extends ServiceProvider
                 $this->my_resources_path('views') => resource_path('views/vendor/mail_reset'),
                 $this->my_resources_path('lang') => resource_path('lang'),
                 $this->my_base_path('database/migrations') => database_path('migrations'),
-            ], 'mail_reset');
+            ], 'mail-reset');
         }
     }
 

@@ -65,7 +65,6 @@ class MailResetBrokerManager implements IMailResetBrokerFactory
 
         return new MailResetBroker(
             $this->createTokenRepository($config),
-            $config['path'],
             $config['model'],
             $this->app['mailer'],
             $config['email_reset']
@@ -106,7 +105,7 @@ class MailResetBrokerManager implements IMailResetBrokerFactory
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["auth.mail_reset.{$name}"];
+        return $this->app['config']["auth.email_resets.{$name}"];
     }
 
     /**

@@ -142,7 +142,7 @@ class MailResetDB
 
             if( !$this->existenceMailAddress($userId, $email, $token) )
                 throw new \Exception(IMailResetBroker::INVALID_USER,422);
-            $this->db->deleteExisting($userId);
+            $this->deleteExisting($userId);
 
             // change email
             $oldEmail = $user->email;
@@ -246,8 +246,9 @@ class MailResetDB
     {
         return ["msg"=>$e->getMessage(),
             "file"=>$e->getFile(),
+            "line"=>$e->getLine(),
             "code"=>$e->getCode(),
-            "trace"=>$e->getTrace()];
+        ];
     }
     /**
      * Create a new token for the user.

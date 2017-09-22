@@ -14,7 +14,7 @@ class MailResetConfirmationToUser extends Mailable
     /**
      * @var object
      */
-    protected $model;
+    protected $user;
     /**
      * token
      * @var string
@@ -24,20 +24,20 @@ class MailResetConfirmationToUser extends Mailable
      * Completely registered URL
      * @var string
      */
-    protected $registerUrl;
+    protected $email;
 
     /**
      * Create a new message instance.
      *
-     * @param object $model User model derived from `Model` class
+     * @param object $user User model derived from `Model` class
      * @param string $token token
-     * @param string $registerUrl Completely registered URL
+     * @param string $newEMail new mail address
      */
-    public function __construct($model, string $token, string $registerUrl)
+    public function __construct($user, string $token, string $newEMail)
     {
-        $this->model = $model;
+        $this->user = $user;
         $this->token = $token;
-        $this->registerUrl = $registerUrl;
+        $this->email = $newEMail;
     }
 
     /**
@@ -48,8 +48,8 @@ class MailResetConfirmationToUser extends Mailable
     {
         $m = $this->text('vendor.mail_reset.mail.confirmation')
             ->subject(env('APP_NAME')." - ".__('mail_reset.email_confirmation_subject'))
-            ->to($this->model->email, $this->model->name)
-            ->with(['user'=>$this->model, 'token'=>$this->token, 'registerUrl'=>$this->registerUrl]);
+            ->to($this->user->email, $this->user->name)
+            ->with(['user'=>$this->user, 'token'=>$this->token, 'email'=>$this->email]);
 
         return $m;
     }
