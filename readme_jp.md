@@ -85,22 +85,19 @@ composer install kaoken/laravel-email-reset
 ]
 ```  
 
-Authユーザーが`users`の場合(**必ず名前は、テーブル名にすること**)
-
-
 - `model`は、ユーザーモデルクラス
-- `path`は、トークを使用した登録時に使用するURLの途中パス(例：`http(s):://hoge.com/{path}/{email}/{token}`)
+- `path`は、トークンを使用した登録時に使用するURLの途中パス(例：`http(s):://hoge.com/{path}/{id}/{email}/{token}`)
 - `email_reset`は、[Mailable](https://readouble.com/laravel/5.5/ja/mail)で派生したクラスを必要に応じて変更すること。
 確認メールを送るときに使用する。  
 - `table`は、このサービスで使用するテーブル名
-- `expire`は、登録後にX時間操作しない場合、仮登録したユーザーが削除される時間
+- `expire`は、登録後にX時間操作しない場合、変更メールアドレス候補が削除される時間
 
 ```php
     'email_resets' => [
         'users' => [
             'model' => App\User::class,
             'path' => 'user/mail_reset/',
-            'email_reset' => Kaoken\LaravelMailReset\Mail\MailResetMailToUser::class,
+            'email_reset' => Kaoken\LaravelMailReset\Mail\MailResetConfirmationToUser::class,
             'table' => 'mail_reset_users',
             'expire' => 24,
         ]
@@ -115,23 +112,22 @@ php artisan vendor:publish --tag=confirmation
 
 * **`database`**
   * **`migrations`**
-    * `2017_09_14_000001_create_confirmation_users_table.php`
+    * `2017_09_21_000001_create_mail_reset_users_table.php`
 * **`resources`**
   * **`lang`**
     * **`en`**
-      * `confirmation.php`
+      * `mail_reset.php`
     * **`ja`**
-      * `confirmation.php`
+      * `mail_reset.php`
   * **`views`**
     * **`vendor`**
       * **`confirmation`**
         * **`mail`**
           * `confirmation.blade.php`
-          * `registration.blade.php`
-  * `registration.blade.php`
+  * `complete.blade.blade.php`
      
 ### マイグレーション
-マイグレーションファイル`2017_09_14_000001_create_confirmation_users_table.php`は、必要に応じて
+マイグレーションファイル`2017_09_21_000001_create_mail_reset_users_table.php`は、必要に応じて
 追加修正すること。
 
 ```bash
@@ -140,170 +136,121 @@ php artisan migrate
 
 ### カーネルへ追加
 `app\Console\Kernel.php`の`schedule`メソッドへ追加する。  
-これは、仮登録後24時間過ぎたユーザーを削除するために使用する。
+これは、メール変更後24時間過ぎたユーザーを削除するために使用する。
 ```php
     protected function schedule(Schedule $schedule)
     {
         ...
         App\Console\Kernel::schedule(Schedule $schedule){
             $schedule->call(function(){
-                MailReset::broker('user')->deleteUserAndToken();
+                MailReset::broker('users')->deleteUserAndToken();
             )->hourly();
         }
     }
 ```
 
-### `.env`
-* `CONFIRMATION_FROM_EMAIL` は、返信先のメールアドレス。デフォルトで、デフォルトのメールアドレスになる。
-* `CONFIRMATION_FROM_NAME` は、返信先の名前。デフォルトで`webmaster`になる。
-
-
 ### メール
 上記設定のコンフィグ`config\auth.php`の場合、
-`email_confirmation`の`Kaoken\LaravelMailReset\Mail\MailResetMailToUser`は、
-仮登録時に確認メールとして使用する。テンプレートは、`views\vendor\confirmation\confirmation.blade.php`
-を使用している。アプリの仕様に合わせて変更すること。
-  
-`email_registration`の`Kaoken\LaravelMailReset\Mail\RegistrationMailToUser`は、
-本登録をしたことを知らせるメールとして使用する。テンプレートは、`views\vendor\confirmation\registration.blade.php`
+`email_reset`の`Kaoken\LaravelMailReset\Mail\MailResetConfirmationToUser::class`は、
+メール変更時に確認メールとして使用する。テンプレートは、`views\vendor\mail_reset\mail\confirmation.blade.php`
 を使用している。アプリの仕様に合わせて変更すること。
 
 
 
 
 ### コントローラー
-仮登録、本登録、ログインの例
+メールアドレス変更の例
 ```php
 <?php
 namespace App\Http\Controllers;
+use Auth;
+use MailReset;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Kaoken\LaravelMailReset\Controllers\MailResetUser;
+use Kaoken\LaravelMailReset\Controllers\MailResetUsers;
 
 class MailResetController extends Controller
-{
-    use AuthenticatesUsers, MailResetUser;
-    
+{  
+    use MailResetUsers;
     /**
-     * AuthenticatesUsers トレイトで使用する 
+     * MailResetUsers トレイトで使用する 
      * @var string
      */
     protected $broker = 'users';
 
     /**
-     * 仮登録画面
+     * メールアドレス変更画面
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getFirstRegister()
+    public function getChangeMail()
     {
         // 各自で用意する
-        return view('first_step_register');
+        return view('change_email');
     }
     
     /**
-     * ユーザーの仮登録をする
+     * ユーザーのメールアドレスを変更する
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse|mixed
      */
-    public function postFirstRegister(Request $request)
+    public function postChangeMail(Request $request)
     {
-        $all = $request->only(['name', 'email', 'password']);
+        $all = $request->only(['email']);
         $validator = Validator::make($all,[
-            'name' => 'required|max:24',
-            'email' => 'required|unique:users,email|max:255|email',
-            'password' => 'required|between:6,32'
+            'email' => 'required|unique:users,email|max:255',
         ]);
 
         if ($validator->fails()) {
-            return redirect('first_register')
+            return redirect('change_email')
                 ->withErrors($validator)
                 ->withInput();
         }
-        $all['password'] = bcrypt($all['password']);
 
-        // 仮登録をする
-        if ( !$this->createUserAndSendMailResetLink($all) ) {
-            return redirect('first_register')
-                            ->withErrors(['confirmation'=>'仮登録に失敗しました。']);
+        switch ( $this->sendMailAddressChangeLink(Auth::guard('customer')->user()->id, $all['email']) ) {
+            case MailReset::INVALID_USER:
+                redirect('first_register')
+                    ->withErrors(['mail_reset'=>'無効なユーザーです。']);
+                break;
+            case MailReset::SAME_EMAIL_EXIST:
+                redirect('first_register')
+                    ->withErrors(['mail_reset'=>'既に同じメールアドレスが存在します。']);
+                break;
+            case MailReset::INVALID_CONFIRMATION:
+            default:
+                redirect('first_register')
+                    ->withErrors(['mail_reset'=>'予期せぬエラーが発生しました。']);
         }
-        // 仮登録を知らせるページへ移動
-        return redirect('first_register_ok');
+        return redirect('change_email_ok');
     }
 }
 ```
-`$broker`は、必ず記述すること。
+クラス内に`use MailResetUsers`と`$broker`は、必ず記述すること。
 
 ### ルート
 上記コントローラより
 
 ```php
-Route::get('user/mail_reset', 'AuthController@getFirstRegister');
-Route::post('register', 'AuthController@postFirstRegister');
-Route::get('register/{email}/{token}', 'AuthController@getCompleteRegistration');
+Route::group([
+        'middleware' => ['auth:user'],
+    ],
+    function(){
+        Route::get('user/mail_reset', 'MailResetController@getChangeMail');
+        Route::post('user/mail_reset', 'MailResetController@postChangeMail');
+        Route::get('user/mail_reset/{id}/{email}/{token}', 'MailResetController@getChangeMailAddress');
+    }
+);
 ```
-### Auth Model
-Authユーザーモデルの例  
-`Kaoken\LaravelMailReset\HasMailReset;`を追加する。
-```php
-<?php
-
-namespace App;
-use Kaoken\LaravelMailReset\HasMailReset;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-
-class User extends Authenticatable
-{
-    use Notifiable, HasMailReset;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
-
-}
-```
-
-`confirmed()`メソッドを使用することにより、本登録済みのユーザーかを判定する。  
-`confirmed()`で、ソーシャルログインなどで、追加修正してログイン判定できるようにすると良い。
 
 ## イベント
-`vendor\kaoken\laravel-confirmation-email\src\Events`ディレクトリ内を参照!  
+`vendor\kaoken\laravel-email-reset\src\Events`ディレクトリ内を参照!  
 
-#### `BeforeCreateUserEvent`
-ユーザーが作成される前に呼び出される。  
-**注意**： このイベントが呼び出されると、Authユーザー作成に関連するDBトランザクションが進行中。  
-リスナーで例外を作成すると、ターゲットのAuthユーザー作成が直ちにロールバックされる。  
+#### `ChangedMailAddressEvent`
+メールアドレスが完全に変更された後に呼び出される。  
 
-#### `BeforeDeleteUsersEvent`
-期限切れのユーザーを削除する前に呼び出される。  
-これは、`MailReset::broker('hoge')->deleteUserAndToken();`のメソッドの引数を`true`に`deleteUserAndToken(true)`した
-場合のみ呼び出される。  
-**注意**： このイベントが呼び出されると、期限切れAuthユーザー削除に関連するDBトランザクションが進行中。  
-リスナーで例外を作成すると、ターゲットのAuthユーザー削除が直ちにロールバックされる。  
+#### `MailResetConfirmationEvent`
+メールアドレスの変更候補を保存後呼び出される。  
 
-
-#### `CreatedUserEvent`
-Authユーザーが作成された後に呼び出される。  
-
-#### `MailResetEvent`
-確認メールを送信した後、認証ユーザーが作成されて呼び出される。  
-
-#### `RegistrationEvent`
-Authユーザーが本登録した後に呼び出される。  
 
 
 

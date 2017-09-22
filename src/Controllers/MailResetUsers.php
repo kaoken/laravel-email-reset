@@ -4,7 +4,7 @@ namespace Kaoken\LaravelMailReset\Controllers;
 use MailReset;
 use \Illuminate\Http\Request;
 
-trait MailResetTrait
+trait MailResetUsers
 {
     /**
      * Send a confirmation link to the user.
@@ -46,19 +46,20 @@ trait MailResetTrait
     /**
      * 本登録処理
      * @param Request $request
-     * @param string $email
-     * @param string $token
+     * @param integer $userId
+     * @param string  $newEmail New email
+     * @param string  $token
      * @return \Illuminate\Http\Response
      */
-    public function getChangeMailAddress(Request $request, $userId, $email, $token)
+    public function getChangeMailAddress(Request $request, $userId, $newEmail, $token)
     {
-        if( !($email == "" || $token == "") ){
+        if( !($newEmail == "" || $token == "") ){
             $broker = null;
             if( method_exists($this, 'broker') )
                 $broker = $this->broker;
 
             $obj = MailReset::broker($broker);
-            switch ($obj->userChangeMailAddress($userId, $email, $token)){
+            switch ($obj->userChangeMailAddress($userId, $newEmail, $token)){
                 case MailReset::CHANGE_EMAIL:
                     return response()->view($this->mailResetCompleteView());
             }

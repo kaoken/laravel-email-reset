@@ -185,7 +185,14 @@ class MailResetDB
 
     /**
      * Delete expired tokens.
-     * @note cron などで呼び出すのが良い
+     * @note Let's add it to the kernel method with reference to the example below.
+     *
+     *  App\Console\Kernel::schedule(Schedule $schedule){
+     *      $schedule->call(function(){
+     *          MailReset::broker('users')->deleteUserAndToken();
+     *      )->hourly();
+     *  }
+     *
      *
      * @return int Number of deleted records
      */

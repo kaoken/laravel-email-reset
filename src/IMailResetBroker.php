@@ -67,12 +67,12 @@ interface IMailResetBroker
     /**
      * Change the mail address from the specified user ID
      * @param int    $userId
-     * @param string $email
+     * @param string $newEmail
      * @param string $token
      * @return Returns true if it succeeds.
      * @throws \Exception
      */
-    public function userChangeMailAddress($userId, $email, $token);
+    public function userChangeMailAddress($userId, $newEmail, $token);
 
     /**
      * Delete expired tokens
