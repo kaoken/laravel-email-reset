@@ -1,0 +1,24 @@
+{
+    "name": "kaoken/laravel-confirmation-email",
+    "description": "Laravel sends confirmation mail after Auth user first registration, complete registration is done after accessing designated address.",
+    "keywords": ["laravel", "confirmation-email"],
+    "license": "MIT",
+    "homepage": "https://github.com/kaoken/veritransjp-airweb-php-laravel",
+    "require": {
+        "php": ">=7.0.0",
+        "laravel/framework": "~5.5"
+    },
+    "authors": [
+        {
+            "name": "kaoken",
+            "homepage": "https://github.com/kaoken/laravel-confirmation-email"
+        }
+    ],
+    "replace": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Kaoken\\EMailReset\\": "src/"
+        }
+    }
+}
