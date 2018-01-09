@@ -2,7 +2,7 @@
 Request to change the e-mail address of the Auth user, change it after moving to the specified URL of the confirmation e-mail.
 
 [![Travis branch](https://img.shields.io/travis/rust-lang/rust/master.svg)](https://github.com/kaoken/laravel-email-reset)
-[![composer version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/kaoken/laravel-email-reset)
+[![composer version](https://img.shields.io/badge/version-1.0.2-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![laravel version](https://img.shields.io/badge/Laravel%20version-≧5.5-red.svg)](https://github.com/kaoken/laravel-email-reset)
 
@@ -115,11 +115,9 @@ This is used to delete users who passed 1 hour after 1st registration.
     protected function schedule(Schedule $schedule)
     {
         ...
-        App\Console\Kernel::schedule(Schedule $schedule){
-            $schedule->call(function(){
-                MailReset::broker('users')->deleteUserAndToken();
-            )->hourly();
-        }
+        $schedule->call(function(){
+            MailReset::broker('users')->deleteUserAndToken();
+        )->hourly();
     }
 ```
 
