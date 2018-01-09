@@ -2,7 +2,7 @@
 Authユーザーのメールアドレスを変更依頼をし、確認メールの変更先URLへ移動後変更する。
 
 [![Travis branch](https://img.shields.io/travis/rust-lang/rust/master.svg)](https://github.com/kaoken/laravel-email-reset)
-[![composer version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/kaoken/laravel-email-reset)
+[![composer version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![laravel version](https://img.shields.io/badge/Laravel%20version-≧5.5-red.svg)](https://github.com/kaoken/laravel-email-reset)
 
@@ -22,14 +22,6 @@ __コンテンツの一覧__
 composer install kaoken/laravel-email-reset
 ```
 
-または、`composer.json`へ追加
-
-```json 
-  "require": {
-    ...
-    "kaoken/laravel-email-reset":"^1.0"
-  }
-```
 
 ## 設定
 
@@ -48,27 +40,7 @@ composer install kaoken/laravel-email-reset
         'MailReset' => Kaoken\LaravelMailReset\Facades\MailReset::class
     ],
 ```
-  
-または、`composer.json`へ追加  
-  
-```js
-{
-    ...
-    "extra": {
-        "laravel": {
-            "dont-discover": [
-            ],
-            "providers": [
-                "Kaoken\\LaravelMailReset\\MailResetServiceProvider",
-            ],
-            "aliases": {
-                "MailReset": "Kaoken\\LaravelMailReset\\Facades\\MailReset"
-            }
-        }
-    },
-    ...
-}
-```
+
   
 ### **`config\auth.php`**へ追加する例
 `'email_reset' => 'users',`を追加する。

@@ -2,7 +2,7 @@
 Request to change the e-mail address of the Auth user, change it after moving to the specified URL of the confirmation e-mail.
 
 [![Travis branch](https://img.shields.io/travis/rust-lang/rust/master.svg)](https://github.com/kaoken/laravel-email-reset)
-[![composer version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/kaoken/laravel-email-reset)
+[![composer version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![laravel version](https://img.shields.io/badge/Laravel%20version-≧5.5-red.svg)](https://github.com/kaoken/laravel-email-reset)
 
@@ -19,16 +19,7 @@ __Table of content__
 
 
 ```bash
-composer install kaoken/laravel-email-reset
-```
-
-or, add `composer.json` 
-
-```json 
-  "require": {
-    ...
-    "kaoken/laravel-email-reset":"^1.0"
-  }
+composer require kaoken/laravel-email-reset
 ```
 
 
@@ -50,27 +41,7 @@ or, add `composer.json`
         'MailReset' => Kaoken\LaravelMailReset\Facades\MailReset::class
     ],
 ```
-  
-or, add `composer.json` 
-  
-```js
-{
-    ...
-    "extra": {
-        "laravel": {
-            "dont-discover": [
-            ],
-            "providers": [
-                "Kaoken\\LaravelMailReset\\MailResetServiceProvider",
-            ],
-            "aliases": {
-                "MailReset": "Kaoken\\LaravelMailReset\\Facades\\MailReset"
-            }
-        }
-    },
-    ...
-}
-```
+
   
 ### Example of adding to **`config\auth.php`**
 add `'email_reset' => 'users',`.
