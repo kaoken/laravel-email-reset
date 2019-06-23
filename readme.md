@@ -2,9 +2,9 @@
 Request to change the e-mail address of the Auth user, change it after moving to the specified URL of the confirmation e-mail.
 
 [![Travis branch](https://img.shields.io/travis/rust-lang/rust/master.svg)](https://github.com/kaoken/laravel-email-reset)
-[![composer version](https://img.shields.io/badge/version-1.0.3-blue.svg)](https://github.com/kaoken/laravel-email-reset)
+[![composer version](https://img.shields.io/badge/version-1.8.4.0-blue.svg)](https://github.com/kaoken/laravel-email-reset)
 [![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://github.com/kaoken/laravel-email-reset)
-[![laravel version](https://img.shields.io/badge/Laravel%20version-≧5.5-red.svg)](https://github.com/kaoken/laravel-email-reset)
+[![laravel version](https://img.shields.io/badge/Laravel%20version-≧5.8-red.svg)](https://github.com/kaoken/laravel-email-reset)
 
 __Table of content__
 
@@ -51,7 +51,7 @@ add `'email_reset' => 'users',`.
     'defaults' => [
         'guard' => 'web',
         'passwords' => 'users',
-        // 追加
+        // add
         'email_reset' => 'users',
     ],
     ...
